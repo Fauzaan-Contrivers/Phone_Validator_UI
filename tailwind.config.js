@@ -7,12 +7,32 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        indigo: {
+          500: "#6379F4",
+          700: "#4756E9",
+        },
+      },
+      // Button styles
+      buttons: {
+        primary: {
+          bg: "indigo-500", // Base color
+          color: "white", // Text color
+          "font-bold": true, // Bold font
+          "rounded-md": true, // Rounded corners
+          "px-4": true, // Horizontal padding
+          "py-2": true, // Vertical padding
+          "hover:bg": "indigo-700", // Hover background color
+          "disabled:opacity": "0.5", // Opacity for disabled state
+          "focus:outline": "none", // Remove focus outline
+          "focus:ring": 2, // Focus ring size
+          "focus:ring-offset": 2, // Focus ring offset
+          "focus:ring-indigo-500": true, // Focus ring color
+        },
       },
     },
   },
   plugins: [],
 };
+
+
