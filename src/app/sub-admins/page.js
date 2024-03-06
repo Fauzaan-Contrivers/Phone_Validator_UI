@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Navbar from "../components/common/navbar";
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -14,7 +16,6 @@ const validationSchema = yup.object().shape({
     .required("Name is required")
     .max(50, "Name cannot be longer than 50 characters"),
   email: yup.string().email("Invalid email").required("Email is required"),
-  role: yup.string().required("Role is required"),
 });
 
 const dummyUsers = [
@@ -65,23 +66,41 @@ const Home = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(validationSchema) }); // Initialize useForm hook
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/api/users");
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     try {
+  //       const response = await fetch("/api/users");
+  //       const data = await response.json();
+  //       setUsers(data);
+  //     } catch (error) {
+  //       console.error("Error fetching users:", error);
+  //     }
+  //   };
 
-    fetchUsers();
-  }, []);
+  //   fetchUsers();
+  // }, []);
 
-  const handleAddUser = (data) => {
+  const handleAddUser =async (data) => {
     // ... your logic to add a new user based on data
     console.log("Adding new user:", data);
+    try {
+      const token = Cookies.get('token'); // Replace with your actual token
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Add any other headers if needed
+      },
+    };
+      const response = await axios.post("http://localhost:8000/auth/create-sub-admin", data,config);
+      console.log('response :>> ', response);
+      if(!response?.data?.error){
+        router.push("/")
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      
+    }
 
     // Close the modal after successful submission
     setShowModal(false);
@@ -135,22 +154,7 @@ const Home = () => {
                 <span className="text-red-500">{errors.email.message}</span>
               )}
             </div>
-            <div className="mb-4">
-              <label htmlFor="role">Role</label>
-              <select
-                name="role"
-                id="role"
-                {...register("role")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              >
-                <option value="">--Select Role--</option>
-                <option value="admin">Admin</option>
-                <option value="subadmin">Sub admin</option>
-              </select>
-              {errors.role && (
-                <span className="text-red-500">{errors.role.message}</span>
-              )}
-            </div>
+           
             <button type="submit" className="btn-primary">
               Add User
             </button>

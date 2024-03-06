@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from 'axios';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -11,19 +12,8 @@ const ForgetPassword = () => {
     setSubmitting(true);
 
     try {
-      const response = await fetch("/api/forget-password", {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        console.log("Password reset request sent successfully!");
-      } else {
-        console.error(
-          "Error sending password reset request:",
-          await response.json()
-        );
-      }
+      const response = await axios.post("http://localhost:8000/auth/forget-password/send-email", {email});
+      console.log('response :>> ', response);
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
