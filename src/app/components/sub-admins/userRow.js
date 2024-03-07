@@ -6,11 +6,11 @@ const UserRow = ({ user, handleDelete }) => {
       <td className="px-3 py-2 text-left">{user?.name}</td>
       <td>{user?.email}</td>
       <td className="px-3 py-2 text-left">{user?.role}</td>
-      <td className="px-3 py-2 text-left">
+      {/* <td className="px-3 py-2 text-left">
         <button className="btn-delete" onClick={() => handleDelete(user?.id)}>
           Delete
         </button>
-      </td>
+      </td> */}
     </tr>
   );
 };

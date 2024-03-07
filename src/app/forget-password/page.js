@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import axios from 'axios';
+import {  toast } from 'react-toastify';
+
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -12,8 +14,18 @@ const ForgetPassword = () => {
     setSubmitting(true);
 
     try {
-      const response = await axios.post("http://localhost:8000/auth/forget-password/send-email", {email});
-      console.log('response :>> ', response);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/forget-password/send-email`, {email});
+      if(!response?.data?.error){
+        toast.success(response?.data?.message, {
+          position: "top-right",
+          autoClose: 2000
+          });
+      }else{
+        toast.error(response?.data?.message, {
+          position: "top-right",
+          autoClose: 3000
+          });
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {

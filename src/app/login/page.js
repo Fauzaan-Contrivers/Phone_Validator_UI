@@ -9,6 +9,8 @@ import axios from 'axios';
 import { useRouter } from "next/navigation";
 import {  toast } from 'react-toastify';
 import Link from 'next/link'
+import Cookies from 'js-cookie';
+
 
 
 const LoginForm = () => {
@@ -36,22 +38,21 @@ const LoginForm = () => {
     setSubmitting(true);
 
     try {
-      const response = await axios.post("http://localhost:8000/auth/login", data);
-      console.log('response :>> ', response);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, data);
       if(!response?.data?.error){
-        document.cookie = `token=${response?.data?.token}`;
+        Cookies.set("userId",response?.data?.id)
+        Cookies.set("token",response?.data?.token)
+        Cookies.set("role",response?.data?.role)
         router.push("/");
-        // toast(response?.data?.message, {
-        //   position: "top-right",
-        //   autoClose: 5000,
-        //   hideProgressBar: false,
-        //   closeOnClick: true,
-        //   pauseOnHover: true,
-        //   draggable: true,
-        //   progress: undefined,
-        //   theme: "light",
-        //   transition: Bounce,
-        //   });
+        toast.success("Logged in successfully.", {
+          position: "top-right",
+          autoClose: 2000
+          });
+      }else{
+        toast.error(response?.data?.message, {
+          position: "top-right",
+          autoClose: 3000
+          });
       }
     } catch (error) {
       console.error("Error submitting form:", error);

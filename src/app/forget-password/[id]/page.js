@@ -6,6 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from 'axios';
 import { useParams, useRouter } from "next/navigation";
+import {  toast } from 'react-toastify';
 
 
 const ResetForm = () => {
@@ -34,14 +35,19 @@ const ResetForm = () => {
     console.log('data :>> ', data);
     console.log('id :>> ', id);
     const formdata={...data,id}
-    
-    // setSubmitting(true);
-
     try {
-      const response = await axios.post("http://localhost:8000/auth/change-password", formdata);
-      console.log('response :>> ', response);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, formdata);
       if(!response?.data?.error){
+        toast.success(response?.data?.message, {
+          position: "top-right",
+          autoClose: 2000
+          });
         router.push("/login")
+      }else{
+        toast.error(response?.data?.message, {
+          position: "top-right",
+          autoClose: 3000
+          });
       }
     } catch (error) {
       console.error("Error submitting form:", error);

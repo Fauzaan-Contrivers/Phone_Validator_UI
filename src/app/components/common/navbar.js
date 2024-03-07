@@ -1,19 +1,32 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Cookies from 'js-cookie';
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [role, setRole] = useState("");
+  const router = useRouter()
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+  const handleLogout = () => {
+    console.log("logout")
+    Cookies.remove("token");
+    Cookies.remove("role");
+    Cookies.remove("userId");
+    router.push("/login")
+  };
+  useEffect(() => {
+    setRole(Cookies.get("role"))
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-800 text-white px-4 py-4 ">
       <div className="flex justify-between items-center">
         <Link href="/" className="text-xl font-bold">
-          Your Logo
+          Phone Validator
         </Link>
 
         <ul className="hidden md:flex space-x-4">
@@ -22,10 +35,13 @@ const Navbar = () => {
               Files
             </Link>
           </li>
-          <li>
+          {role === "admin" && <li>
             <Link href="/sub-admins" className="hover:text-gray-400">
-              Sub Admins
+              Users
             </Link>
+          </li>}
+          <li onClick={handleLogout} className="cursor-pointer">
+            Logout
           </li>
         </ul>
 

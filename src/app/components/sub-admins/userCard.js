@@ -10,9 +10,9 @@ export default function UserCard({ user, handleDelete }) {
         <p>Name: {user?.name}</p>
         <p>Email: {user?.email}</p>
         <p>Role: {user?.role}</p>
-        <button className="btn-delete" onClick={() => handleDelete(user?.id)}>
+        {/* <button className="btn-delete" onClick={() => handleDelete(user?.id)}>
           Delete
-        </button>
+        </button> */}
       </div>
     </div>
   );

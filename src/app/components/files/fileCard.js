@@ -1,21 +1,14 @@
 "use client";
+import dayjs from "dayjs";
 import React from "react";
+import { FaCloudDownloadAlt } from "react-icons/fa";
+
 
 const formatDate = (date) => {
-  const options = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  };
-  const formattedDate = new Date(date).toLocaleString("en-US", options);
-  return formattedDate;
+  return dayjs(date).format("YYYY-MM-DD h:mm:ss A")
 };
-
 export default function fileCard({ file, handleDownload }) {
-  const formattedDate = formatDate(file?.uploadedAt);
+  const formattedDate = formatDate(file?.updated_at);
   return (
     <div
       key={file.id}
@@ -23,15 +16,23 @@ export default function fileCard({ file, handleDownload }) {
     >
       <div className="flex flex-col gap-2">
         <p>Uploaded at: {formattedDate}</p>
-        <p>Uploaded by: {file?.uploadedBy}</p>
-        <p>Original file: {file?.originalFilename}</p>
-        <p>Cleaned file: {file?.cleanedFilename}</p>
-        <button
+        <p>Uploaded by: {file?.user?.name}</p>
+        <div className="  flex gap-4 item-center" onClick={()=>handleDownload(file?.fileName)}>Original file: {file?.originalName} 
+        <div onClick={()=>handleDownload(file?.fileName)} className="cursor-pointer">
+        <FaCloudDownloadAlt />
+        </div>
+        </div>
+        <div className=" flex gap-4 item-center" >Cleaned file: {file?.cleanedName} 
+         <div onClick={()=>handleDownload(file?.cleanedName)} className="cursor-pointer">
+        <FaCloudDownloadAlt />
+        </div>
+        </div>
+        {/* <button
           className="btn-primary"
           onClick={() => handleDownload(file?.id)}
         >
           Download
-        </button>
+        </button> */}
       </div>
     </div>
   );
