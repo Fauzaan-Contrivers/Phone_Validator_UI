@@ -1,30 +1,28 @@
 "use client";
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from 'axios';
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {  toast } from 'react-toastify';
-import Link from 'next/link'
-import Cookies from 'js-cookie';
 
 
-
-const LoginForm = () => {
+const ResetForm = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const schema = yup.object().shape({
-    email: yup.string().required("Email is required").email("Invalid email"),
     password: yup
       .string()
+      .required("Password is required"),
+    confirm: yup
+      .string()
       .required("Password is required")
-      // .min(8, "Password must be at least 8 characters"),
+      
   });
   const router=useRouter()
-
+  const {id}=useParams()
   const {
     register,
     handleSubmit,
@@ -35,19 +33,16 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     console.log('data :>> ', data);
-    setSubmitting(true);
-
+    console.log('id :>> ', id);
+    const formdata={...data,id}
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, data);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, formdata);
       if(!response?.data?.error){
-        Cookies.set("userId",response?.data?.id)
-        Cookies.set("token",response?.data?.token)
-        Cookies.set("role",response?.data?.role)
-        router.push("/");
-        toast.success("Logged in successfully.", {
+        toast.success(response?.data?.message, {
           position: "top-right",
           autoClose: 2000
           });
+        router.push("/login")
       }else{
         toast.error(response?.data?.message, {
           position: "top-right",
@@ -68,23 +63,7 @@ const LoginForm = () => {
         className="w-full max-w-md bg-white rounded-lg shadow-md px-8 py-6 md:max-w-lg"
       >
         {/* Email and password fields with validation */}
-        <div className="mb-4">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            {...register("email")}
-            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-          />
-          <ErrorMessage
-            errors={errors}
-            name="email"
-            render={({ message }) => (
-              <span className="text-red-500 text-sm">{message}</span>
-            )}
-          />
-        </div>
+       
 
         <div className="mb-4">
           <label htmlFor="password">Password</label>
@@ -103,18 +82,33 @@ const LoginForm = () => {
             )}
           />
         </div>
-       <div className="flex justify-end mb-2 text-blue-500 hover:text-blue-600"><Link href="/forget-password">Forgot password?</Link></div>
+        <div className="mb-4">
+          <label htmlFor="confirm">Confirm</label>
+          <input
+            // type="text"
+            name="confirm"
+            {...register("confirm")}
+            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <ErrorMessage
+            errors={errors}
+            name="confirm"
+            render={({ message }) => (
+              <span className="text-red-500 text-sm">{message}</span>
+            )}
+          />
+        </div>
+
         <button
           type="submit"
           className="btn-primary"
           disabled={submitting || Object.keys(errors).length > 0}
         >
-          {submitting ? "Submitting..." : "Login"}
+          {submitting ? "Submitting..." : "Reset"}
         </button>
-        
       </form>
     </div>
   );
 };
 
-export default LoginForm;
+export default ResetForm;

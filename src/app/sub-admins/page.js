@@ -7,6 +7,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Navbar from "../components/common/navbar";
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
+import InfiniteProgressBar from "../../common/Progressbar"
+
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -14,51 +19,15 @@ const validationSchema = yup.object().shape({
     .required("Name is required")
     .max(50, "Name cannot be longer than 50 characters"),
   email: yup.string().email("Invalid email").required("Email is required"),
-  role: yup.string().required("Role is required"),
 });
 
-const dummyUsers = [
-  {
-    id: 1,
-    name: "Awais",
-    email: "awais@contrivers.dev",
-    role: "Admin",
-  },
-  {
-    id: 2,
-    name: "Awais",
-    email: "awais@contrivers.dev",
-    role: "Admin",
-  },
-  {
-    id: 3,
-    name: "Awais",
-    email: "awais@contrivers.dev",
-    role: "Admin",
-  },
-  {
-    id: 4,
-    name: "Awais",
-    email: "awais@contrivers.dev",
-    role: "Admin",
-  },
-  {
-    id: 5,
-    name: "Awais",
-    email: "awais@contrivers.dev",
-    role: "Admin",
-  },
-  {
-    id: 6,
-    name: "Awais",
-    email: "awais@contrivers.dev",
-    role: "Admin",
-  },
-];
 
 const Home = () => {
-  const [users, setUsers] = useState(dummyUsers);
+  const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -68,9 +37,15 @@ const Home = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("/api/users");
-        const data = await response.json();
-        setUsers(data);
+        const token = Cookies.get('token'); // Replace with your actual token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Add any other headers if needed
+          },
+        };
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/all-users`, config);
+        setUsers(response?.data?.users);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -79,9 +54,38 @@ const Home = () => {
     fetchUsers();
   }, []);
 
-  const handleAddUser = (data) => {
+  const handleAddUser = async (data) => {
     // ... your logic to add a new user based on data
     console.log("Adding new user:", data);
+    try {
+      const token = Cookies.get('token'); // Replace with your actual token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Add any other headers if needed
+        },
+      };
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/create-sub-admin`, data, config);
+      if (!response?.data?.error) {
+        toast.success(response?.data?.message, {
+          position: "top-right",
+          autoClose: 2000
+        });
+        toast.success("An email has been sent; please change the password using the link.", {
+          position: "top-right",
+          autoClose: 2000
+        });
+      } else {
+        toast.error(response?.data?.message, {
+          position: "top-right",
+          autoClose: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+
+    }
 
     // Close the modal after successful submission
     setShowModal(false);
@@ -92,14 +96,79 @@ const Home = () => {
     // Implement download logic using libraries like `axios` or download link generation
     console.log("Downloading file:", fileId);
   };
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+  const handleUpload = async () => {
+    setLoading(true)
+    if (!selectedFile) {
+      return; // Handle no file selected case
+    }
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    console.log('selectedFile :>> ', selectedFile);
+
+    try {
+      const token = Cookies.get('token'); // Replace with your actual token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Add any other headers if needed
+        },
+      };
+      const id = Cookies.get("userId")
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`, formData, config);
+
+      if (!response?.data?.error) {
+        setSelectedFile(null); // Clear selected file after upload
+        toast.success("Sheet uploaded.", {
+          position: "top-right",
+          autoClose: 2000
+        });
+      } else {
+        console.error("Error uploading file:", await response.json());
+        toast.error(response?.data?.message, {
+          position: "top-right",
+          autoClose: 3000
+        });
+        // Handle upload error
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      // Handle general upload error
+    }
+    setLoading(false)
+  };
 
   return (
     <>
+      {loading && <InfiniteProgressBar />}
       <Navbar />
       <div className="p-4">
-        <div className="flex flex-col justify-between mb-4">
+        <div className="flex  justify-between mb-4 items-center">
+
+          <div className="flex flex-col justify-between my-4">
+            <input
+              type="file"
+              className="custom-file-input"
+              id="uploadFile"
+              onChange={handleFileChange}
+            />
+            {/* <label className="custom-file-label" htmlFor="uploadFile">
+              {!selectedFile ? "Choose a file..." : selectedFile.name}
+            </label> */}
+            <button
+              className="btn-primary w-[100px] mt-4 "
+              onClick={handleUpload}
+              disabled={!selectedFile}
+            >
+              Upload
+            </button>
+          </div>
+
           <button
-            className="btn-primary w-[150px]"
+            className="btn-primary w-[150px] "
             onClick={() => setShowModal(true)}
           >
             Add User
@@ -107,9 +176,9 @@ const Home = () => {
         </div>
 
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-          <h3>Add New User</h3>
+          <h3 className=" text-[24px] font-semibold">Add New User</h3>
           <form onSubmit={handleSubmit(handleAddUser)}>
-            <div className="mb-4">
+            <div className="mb-4 mt-4">
               <label htmlFor="name">Name</label>
               <input
                 type="text"
@@ -135,22 +204,7 @@ const Home = () => {
                 <span className="text-red-500">{errors.email.message}</span>
               )}
             </div>
-            <div className="mb-4">
-              <label htmlFor="role">Role</label>
-              <select
-                name="role"
-                id="role"
-                {...register("role")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              >
-                <option value="">--Select Role--</option>
-                <option value="admin">Admin</option>
-                <option value="subadmin">Sub admin</option>
-              </select>
-              {errors.role && (
-                <span className="text-red-500">{errors.role.message}</span>
-              )}
-            </div>
+
             <button type="submit" className="btn-primary">
               Add User
             </button>
@@ -163,7 +217,7 @@ const Home = () => {
                 <th className="px-3 py-2 text-left">Name</th>
                 <th className="px-3 py-2 text-left">Email</th>
                 <th className="px-3 py-2 text-left">Role</th>
-                <th className="px-3 py-2 text-left">Action</th>
+                {/* <th className="px-3 py-2 text-left">Action</th> */}
               </tr>
             </thead>
             <tbody>
