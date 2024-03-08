@@ -45,8 +45,62 @@ const Home = () => {
     setSelectedFile(event.target.files[0]);
   };
 
-  // Handle file upload (replace with actual API call)
-  const handleUpload = async () => {
+  const handleUpload = () => {
+    const role = Cookies.get("role");
+    if (role === "admin") {
+      handleAdminUpload();
+    } else {
+      handleUserUpload();
+    }
+  };
+
+  //  Admin
+  const handleAdminUpload = async () => {
+    setLoading(true);
+    if (!selectedFile) {
+      return; // Handle no file selected case
+    }
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    try {
+      const token = Cookies.get("token"); // Replace with your actual token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Add any other headers if needed
+        },
+      };
+      const id = Cookies.get("userId");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`,
+        formData,
+        config
+      );
+      if (!response?.data?.error) {
+        setLoading(false);
+        setSelectedFile(null); // Clear selected file after upload
+        toast.success("Sheet uploaded.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else {
+        setLoading(false);
+        console.log("Error uploading file:", await response.json());
+        toast.error(response?.data?.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        // Handle upload error
+      }
+    } catch (error) {
+      console.log("Error uploading file:", error);
+      setLoading(false);
+      // Handle general upload error
+    }
+  };
+
+  //User
+  const handleUserUpload = async () => {
     setLoading(true);
     if (!selectedFile) {
       return; // Handle no file selected case
@@ -69,27 +123,27 @@ const Home = () => {
         formData,
         config
       );
-      console.log("response :>> ", response);
+
       if (!response?.data?.error) {
         setSelectedFile(null); // Clear selected file after upload
+        setLoading(false);
         toast.success(response?.data?.message, {
           position: "top-right",
           autoClose: 2000,
         });
         setRefetch((fe) => !fe);
       } else {
+        setLoading(false);
         toast.error(response?.data?.message, {
           position: "top-right",
           autoClose: 3000,
         });
-        console.error("Error uploading file:", await response.json());
-        // Handle upload error
+        console.log("Error uploading file:", await response.json());
       }
     } catch (error) {
-      console.error("Error uploading file:", error);
-      // Handle general upload error
+      setLoading(false);
+      console.log("Error uploading file:", error);
     }
-    setLoading(false);
   };
 
   // Handle file download logic (replace with your implementation)
@@ -116,7 +170,7 @@ const Home = () => {
       a.click();
       document.body.removeChild(a);
     } catch (error) {
-      console.error("Error fetching files:", error);
+      console.log("Error fetching files:", error);
       toast.error(error?.message, {
         position: "top-right",
         autoClose: 3000,
