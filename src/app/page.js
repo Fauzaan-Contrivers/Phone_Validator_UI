@@ -197,7 +197,7 @@ const Home = () => {
           <button
             className="btn-primary w-[100px] mt-4"
             onClick={handleUpload}
-            disabled={!selectedFile}
+            disabled={!selectedFile || loading}
           >
             Upload
           </button>
