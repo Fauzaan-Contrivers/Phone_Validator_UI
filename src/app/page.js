@@ -190,6 +190,7 @@ const Home = () => {
             id="uploadFile"
             onChange={handleFileChange}
             // value={selectedFile}
+            accept=".csv"
           />
           {/* <label className="custom-file-label" htmlFor="uploadFile">
             {!selectedFile ? "Choose a file..." : selectedFile.name}
