@@ -68,7 +68,7 @@ const Home = () => {
         headers: {
           Authorization: `Bearer ${token}`,
           Connection: "keep-alive",
-          "Keep-Alive": "timeout=600",
+          "Keep-Alive": "timeout=6000",
         },
       };
       const id = Cookies.get("userId");
@@ -117,7 +117,7 @@ const Home = () => {
           Authorization: `Bearer ${token}`,
           // Add any other headers if needed
           Connection: "keep-alive",
-          "Keep-Alive": "timeout=600",
+          "Keep-Alive": "timeout=6000",
         },
       };
       const id = Cookies.get("userId");
