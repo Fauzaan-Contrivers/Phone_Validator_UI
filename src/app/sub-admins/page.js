@@ -30,36 +30,34 @@ const Home = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(validationSchema) }); // Initialize useForm hook
+  } = useForm({ resolver: yupResolver(validationSchema) });
+
+  const fetchUsers = async () => {
+    try {
+      const token = Cookies.get("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/all-users`,
+        config
+      );
+      setUsers(response?.data?.users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = Cookies.get("token"); // Replace with your actual token
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Add any other headers if needed
-          },
-        };
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/all-users`,
-          config
-        );
-        setUsers(response?.data?.users);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-
     fetchUsers();
   }, []);
 
   const handleAddUser = async (data) => {
-    // ... your logic to add a new user based on data
-    console.log("Adding new user:", data);
+    setLoading(true);
     try {
-      const token = Cookies.get("token"); // Replace with your actual token
+      const token = Cookies.get("token");
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -72,29 +70,25 @@ const Home = () => {
         config
       );
       if (!response?.data?.error) {
+        setLoading(false);
         toast.success(response?.data?.message, {
           position: "top-right",
           autoClose: 2000,
         });
-        toast.success(
-          "An email has been sent; please change the password using the link.",
-          {
-            position: "top-right",
-            autoClose: 2000,
-          }
-        );
+        fetchUsers();
       } else {
+        setLoading(false);
         toast.error(response?.data?.message, {
           position: "top-right",
           autoClose: 3000,
         });
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error submitting form:", error);
     } finally {
     }
 
-    // Close the modal after successful submission
     setShowModal(false);
   };
 
@@ -109,19 +103,18 @@ const Home = () => {
   const handleUpload = async () => {
     setLoading(true);
     if (!selectedFile) {
-      return; // Handle no file selected case
+      setLoading(false);
+      return;
     }
 
     const formData = new FormData();
     formData.append("image", selectedFile);
-    console.log("selectedFile :>> ", selectedFile);
 
     try {
-      const token = Cookies.get("token"); // Replace with your actual token
+      const token = Cookies.get("token");
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          // Add any other headers if needed
         },
       };
       const id = Cookies.get("userId");
@@ -132,13 +125,15 @@ const Home = () => {
       );
 
       if (!response?.data?.error) {
-        setSelectedFile(null); // Clear selected file after upload
+        setSelectedFile(null);
+        setLoading(false);
         toast.success("Sheet uploaded.", {
           position: "top-right",
           autoClose: 2000,
         });
       } else {
-        console.error("Error uploading file:", await response.json());
+        setLoading(false);
+        // console.error("Error uploading file:", await response.json());
         toast.error(response?.data?.message, {
           position: "top-right",
           autoClose: 3000,
@@ -146,10 +141,9 @@ const Home = () => {
         // Handle upload error
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error uploading file:", error);
-      // Handle general upload error
     }
-    setLoading(false);
   };
 
   return (
@@ -215,8 +209,8 @@ const Home = () => {
               )}
             </div>
 
-            <button type="submit" className="btn-primary">
-              Add User
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? "Adding User..." : "Add User"}
             </button>
           </form>
         </Modal>

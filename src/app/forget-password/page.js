@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import axios from 'axios';
-import {  toast } from 'react-toastify';
-
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -14,17 +13,20 @@ const ForgetPassword = () => {
     setSubmitting(true);
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/forget-password/send-email`, {email});
-      if(!response?.data?.error){
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/forget-password/send-email`,
+        { email }
+      );
+      if (!response?.data?.error) {
         toast.success(response?.data?.message, {
           position: "top-right",
-          autoClose: 2000
-          });
-      }else{
+          autoClose: 2000,
+        });
+      } else {
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000
-          });
+          autoClose: 3000,
+        });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -35,11 +37,6 @@ const ForgetPassword = () => {
 
   return (
     <div className="flex min-h-screen justify-center items-center flex-col">
-      {/* <h1>Forgot Password</h1>
-      <p>
-        Enter your email address and we will send you instructions to reset your
-        password.
-      </p> */}
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white rounded-lg shadow-md px-8 py-6 md:max-w-lg"
