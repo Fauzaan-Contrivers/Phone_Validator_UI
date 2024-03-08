@@ -7,11 +7,10 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Navbar from "../components/common/navbar";
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import InfiniteProgressBar from "../../common/Progressbar"
-
+import axios from "axios";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import InfiniteProgressBar from "../../common/Progressbar";
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -20,7 +19,6 @@ const validationSchema = yup.object().shape({
     .max(50, "Name cannot be longer than 50 characters"),
   email: yup.string().email("Invalid email").required("Email is required"),
 });
-
 
 const Home = () => {
   const [users, setUsers] = useState([]);
@@ -37,14 +35,17 @@ const Home = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = Cookies.get('token'); // Replace with your actual token
+        const token = Cookies.get("token"); // Replace with your actual token
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
             // Add any other headers if needed
           },
         };
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/all-users`, config);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/all-users`,
+          config
+        );
         setUsers(response?.data?.users);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -58,33 +59,39 @@ const Home = () => {
     // ... your logic to add a new user based on data
     console.log("Adding new user:", data);
     try {
-      const token = Cookies.get('token'); // Replace with your actual token
+      const token = Cookies.get("token"); // Replace with your actual token
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           // Add any other headers if needed
         },
       };
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/create-sub-admin`, data, config);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/create-sub-admin`,
+        data,
+        config
+      );
       if (!response?.data?.error) {
         toast.success(response?.data?.message, {
           position: "top-right",
-          autoClose: 2000
+          autoClose: 2000,
         });
-        toast.success("An email has been sent; please change the password using the link.", {
-          position: "top-right",
-          autoClose: 2000
-        });
+        toast.success(
+          "An email has been sent; please change the password using the link.",
+          {
+            position: "top-right",
+            autoClose: 2000,
+          }
+        );
       } else {
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000
+          autoClose: 3000,
         });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
-
     }
 
     // Close the modal after successful submission
@@ -100,37 +107,41 @@ const Home = () => {
     setSelectedFile(event.target.files[0]);
   };
   const handleUpload = async () => {
-    setLoading(true)
+    setLoading(true);
     if (!selectedFile) {
       return; // Handle no file selected case
     }
 
     const formData = new FormData();
     formData.append("image", selectedFile);
-    console.log('selectedFile :>> ', selectedFile);
+    console.log("selectedFile :>> ", selectedFile);
 
     try {
-      const token = Cookies.get('token'); // Replace with your actual token
+      const token = Cookies.get("token"); // Replace with your actual token
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           // Add any other headers if needed
         },
       };
-      const id = Cookies.get("userId")
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`, formData, config);
+      const id = Cookies.get("userId");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`,
+        formData,
+        config
+      );
 
       if (!response?.data?.error) {
         setSelectedFile(null); // Clear selected file after upload
         toast.success("Sheet uploaded.", {
           position: "top-right",
-          autoClose: 2000
+          autoClose: 2000,
         });
       } else {
         console.error("Error uploading file:", await response.json());
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000
+          autoClose: 3000,
         });
         // Handle upload error
       }
@@ -138,16 +149,15 @@ const Home = () => {
       console.error("Error uploading file:", error);
       // Handle general upload error
     }
-    setLoading(false)
+    setLoading(false);
   };
 
   return (
     <>
       {loading && <InfiniteProgressBar />}
       <Navbar />
-      <div className="p-4">
+      <div className="p-4 pt-[80px]">
         <div className="flex  justify-between mb-4 items-center">
-
           <div className="flex flex-col justify-between my-4">
             <input
               type="file"

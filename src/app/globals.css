@@ -12,18 +12,14 @@
   }
 }
 
-body {
-  padding-top: 80px;
-}
 /* InfiniteProgressBar.css */
 .infinite-progress-bar {
   width: 100%;
   height: 10px;
   position: fixed;
   overflow: hidden;
-  top:0;
+  top: 0;
   z-index: 100;
-
 }
 
 .bar {
@@ -41,4 +37,3 @@ body {
     transform: translateX(100%);
   }
 }
-

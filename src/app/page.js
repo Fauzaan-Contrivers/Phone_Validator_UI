@@ -3,11 +3,10 @@ import React, { useState, useEffect } from "react";
 import FileRow from "./components/files/fileRow";
 import FileCard from "./components/files/fileCard";
 import Navbar from "./components/common/navbar";
-import Cookies from 'js-cookie';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import InfiniteProgressBar from "../common/Progressbar"
-
+import Cookies from "js-cookie";
+import axios from "axios";
+import { toast } from "react-toastify";
+import InfiniteProgressBar from "../common/Progressbar";
 
 const Home = () => {
   const [files, setFiles] = useState([]);
@@ -19,16 +18,19 @@ const Home = () => {
     // Fetch all files from the database
     const fetchFiles = async () => {
       try {
-        const token = Cookies.get('token'); // Replace with your actual token
-        const id = Cookies.get('userId'); // Replace with your actual token
+        const token = Cookies.get("token"); // Replace with your actual token
+        const id = Cookies.get("userId"); // Replace with your actual token
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
             // Add any other headers if needed
           },
         };
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/all-sheets/${id}`, config);
-        console.log('data :>> ', response);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/all-sheets/${id}`,
+          config
+        );
+        console.log("data :>> ", response);
         setFiles(response?.data?.sheets);
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -37,10 +39,6 @@ const Home = () => {
 
     fetchFiles();
   }, [refetch]);
-
-
-
-
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -58,27 +56,31 @@ const Home = () => {
     formData.append("file", selectedFile);
 
     try {
-      const token = Cookies.get('token'); // Replace with your actual token
+      const token = Cookies.get("token"); // Replace with your actual token
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           // Add any other headers if needed
         },
       };
-      const id = Cookies.get("userId")
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/sheets/upload-file/${id}`, formData, config);
-      console.log('response :>> ', response);
+      const id = Cookies.get("userId");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload-file/${id}`,
+        formData,
+        config
+      );
+      console.log("response :>> ", response);
       if (!response?.data?.error) {
         setSelectedFile(null); // Clear selected file after upload
         toast.success(response?.data?.message, {
           position: "top-right",
-          autoClose: 2000
+          autoClose: 2000,
         });
-        setRefetch((fe) => !fe)
+        setRefetch((fe) => !fe);
       } else {
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000
+          autoClose: 3000,
         });
         console.error("Error uploading file:", await response.json());
         // Handle upload error
@@ -87,24 +89,27 @@ const Home = () => {
       console.error("Error uploading file:", error);
       // Handle general upload error
     }
-    setLoading(false)
+    setLoading(false);
   };
 
   // Handle file download logic (replace with your implementation)
 
   const handleDownload = async (name) => {
     try {
-      const token = Cookies.get('token'); // Replace with your actual token
+      const token = Cookies.get("token"); // Replace with your actual token
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           // Add any other headers if needed
         },
       };
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/download/:${name}`, config);
-      console.log('response :>> ', response);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/download/:${name}`,
+        config
+      );
+      console.log("response :>> ", response);
       const url = window.URL.createObjectURL(new Blob([response.data])); // Access response.data as the Blob
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `${name}`;
       document.body.appendChild(a);
@@ -114,7 +119,7 @@ const Home = () => {
       console.error("Error fetching files:", error);
       toast.error(error?.message, {
         position: "top-right",
-        autoClose: 3000
+        autoClose: 3000,
       });
     }
   };
@@ -123,13 +128,14 @@ const Home = () => {
     <>
       {loading && <InfiniteProgressBar />}
       <Navbar />
-      <div className="p-4">
+      <div className="p-4 mt-[80px]">
         <div className="flex flex-col justify-between mb-4">
           <input
             type="file"
             className="custom-file-input"
             id="uploadFile"
             onChange={handleFileChange}
+            // value={selectedFile}
           />
           {/* <label className="custom-file-label" htmlFor="uploadFile">
             {!selectedFile ? "Choose a file..." : selectedFile.name}
@@ -176,7 +182,6 @@ const Home = () => {
           ))}
         </div>
       </div>
-
     </>
   );
 };
