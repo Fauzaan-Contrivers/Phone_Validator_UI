@@ -65,7 +65,7 @@ const Home = () => {
         },
       };
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/create-sub-admin`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/createUser`,
         data,
         config
       );

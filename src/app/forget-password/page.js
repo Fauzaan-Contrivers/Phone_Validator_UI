@@ -14,7 +14,7 @@ const ForgetPassword = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/forget-password/send-email`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/forgetPassword`,
         { email }
       );
       if (!response?.data?.error) {

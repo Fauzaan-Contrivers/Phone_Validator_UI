@@ -11,34 +11,34 @@ import InfiniteProgressBar from "../common/Progressbar";
 const Home = () => {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [refetch, setRefetch] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Fetch all files from the database
-    const fetchFiles = async () => {
-      try {
-        const token = Cookies.get("token"); // Replace with your actual token
-        const id = Cookies.get("userId"); // Replace with your actual token
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Add any other headers if needed
-          },
-        };
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/all-sheets/${id}`,
-          config
-        );
-        console.log("data :>> ", response);
-        setFiles(response?.data?.sheets);
-      } catch (error) {
-        console.error("Error fetching files:", error);
-      }
-    };
+  // Fetch all files from the database
+  const fetchFiles = async () => {
+    try {
+      const token = Cookies.get("token"); // Replace with your actual token
+      const id = Cookies.get("userId"); // Replace with your actual token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Add any other headers if needed
+        },
+      };
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/all-sheets/${id}`,
+        config
+      );
+      console.log("data :>> ", response);
+      setFiles(response?.data?.sheets);
+    } catch (error) {
+      console.error("Error fetching files:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchFiles();
-  }, [refetch]);
+  }, []);
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -84,6 +84,7 @@ const Home = () => {
           position: "top-right",
           autoClose: 2000,
         });
+        fetchFiles();
       } else {
         setLoading(false);
         console.log("Error uploading file:", await response.json());
@@ -134,7 +135,7 @@ const Home = () => {
           position: "top-right",
           autoClose: 2000,
         });
-        setRefetch((fe) => !fe);
+        fetchFiles();
       } else {
         setLoading(false);
         toast.error(response?.data?.message, {
