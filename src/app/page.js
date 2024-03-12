@@ -11,8 +11,12 @@ import InfiniteProgressBar from "../common/Progressbar";
 const Home = () => {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [row, setrow] = useState("");
+  const [totalPhones, setTotalDbPhones] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  const Userrole = Cookies.get("role");
 
   // Fetch all files from the database
   const fetchFiles = async () => {
@@ -29,8 +33,27 @@ const Home = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/auth/all-sheets/${id}`,
         config
       );
-      console.log("data :>> ", response);
       setFiles(response?.data?.sheets);
+    } catch (error) {
+      console.error("Error fetching files:", error);
+    }
+  };
+
+  // Fetch phone count from the database
+  const fetchPhoneCount = async () => {
+    try {
+      const token = Cookies.get("token");
+      const id = Cookies.get("userId");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/phoneCount`,
+        config
+      );
+      setTotalDbPhones(response?.data);
     } catch (error) {
       console.error("Error fetching files:", error);
     }
@@ -38,6 +61,12 @@ const Home = () => {
 
   useEffect(() => {
     fetchFiles();
+    fetchPhoneCount();
+    setrow(
+      Userrole !== "admin" && (
+        <th className="px-3 py-2 text-left">Cleaned File</th>
+      )
+    );
   }, []);
 
   // Handle file selection
@@ -73,7 +102,7 @@ const Home = () => {
       };
       const id = Cookies.get("userId");
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/adminUpload/${id}`,
         formData,
         config
       );
@@ -85,6 +114,7 @@ const Home = () => {
           autoClose: 2000,
         });
         fetchFiles();
+        fetchPhoneCount();
       } else {
         setLoading(false);
         console.log("Error uploading file:", await response.json());
@@ -123,7 +153,7 @@ const Home = () => {
       };
       const id = Cookies.get("userId");
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload-file/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/userUpload/${id}`,
         formData,
         config
       );
@@ -142,7 +172,7 @@ const Home = () => {
           position: "top-right",
           autoClose: 3000,
         });
-        console.log("Error uploading file:", await response.json());
+        console.log("Error uploading file:");
       }
     } catch (error) {
       setLoading(false);
@@ -186,27 +216,30 @@ const Home = () => {
     <>
       {loading && <InfiniteProgressBar />}
       <Navbar />
-      <div className="p-4 mt-[80px]">
-        <div className="flex flex-col justify-between mb-4">
-          <input
-            type="file"
-            className="custom-file-input"
-            id="uploadFile"
-            onChange={handleFileChange}
-            // value={selectedFile}
-            accept=".csv"
-          />
-          {/* <label className="custom-file-label" htmlFor="uploadFile">
-            {!selectedFile ? "Choose a file..." : selectedFile.name}
-          </label> */}
-          <button
-            className="btn-primary w-[100px] mt-4"
-            onClick={handleUpload}
-            disabled={!selectedFile || loading}
-          >
-            Upload
-          </button>
+      <div className="p-4 mt-[80px] ">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex flex-col justify-between mb-4">
+            <input
+              type="file"
+              className="custom-file-input max-w-[250px]"
+              id="uploadFile"
+              onChange={handleFileChange}
+              accept=".csv"
+            />
+            <button
+              className="btn-primary w-[100px] mt-4"
+              onClick={handleUpload}
+              disabled={!selectedFile || loading}
+            >
+              Upload
+            </button>
+          </div>
+          <div className="bg-gray-200 text-[20px]  text-center sm:px-3 sm:py-3 p-2">
+            <div className="font-semibold">Total phone</div>
+            {totalPhones}
+          </div>
         </div>
+
         {/* <h1>File List</h1> */}
 
         <div className="lg:block hidden ">
@@ -216,8 +249,8 @@ const Home = () => {
                 <th className="px-3 py-2 text-left">Uploaded At</th>
                 <th className="px-3 py-2 text-left">Uploaded By</th>
                 <th className="px-3 py-2 text-left">Original File</th>
-                {/* <th className="px-3 py-2 text-left">Analyzed File</th> */}
-                <th className="px-3 py-2 text-left">Cleaned File</th>
+                {row}
+                <th className="px-3 py-2 text-left">Duplicate File</th>
               </tr>
             </thead>
             <tbody>
@@ -226,6 +259,7 @@ const Home = () => {
                   key={file.id}
                   file={file}
                   handleDownload={handleDownload}
+                  role={Userrole}
                 />
               ))}
             </tbody>
@@ -237,6 +271,7 @@ const Home = () => {
               key={file.id}
               file={file}
               handleDownload={handleDownload}
+              role={Userrole}
             />
           ))}
         </div>

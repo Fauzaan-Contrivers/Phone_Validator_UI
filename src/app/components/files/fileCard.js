@@ -6,7 +6,7 @@ import { FaCloudDownloadAlt } from "react-icons/fa";
 const formatDate = (date) => {
   return dayjs(date).format("YYYY-MM-DD h:mm:ss A");
 };
-export default function fileCard({ file, handleDownload }) {
+export default function fileCard({ file, handleDownload, role }) {
   const formattedDate = formatDate(file?.updated_at);
   return (
     <div
@@ -28,21 +28,39 @@ export default function fileCard({ file, handleDownload }) {
             <FaCloudDownloadAlt />
           </div>
         </div>
-        <div className=" flex gap-4 item-center">
-          Cleaned file: {file?.cleanFileName || "N/A"}
-          <div
-            onClick={() => handleDownload(file?.cleanFileName)}
-            className="cursor-pointer"
-          >
-            <FaCloudDownloadAlt />
+
+        {role !== "admin" && (
+          <div className=" flex gap-4 item-center">
+            Cleaned file: {file?.cleanFileName || "N/A"}
+            <div
+              onClick={() => handleDownload(file?.cleanFileName)}
+              className="cursor-pointer"
+            >
+              <FaCloudDownloadAlt />
+            </div>
           </div>
-        </div>
-        {/* <button
-          className="btn-primary"
-          onClick={() => handleDownload(file?.id)}
-        >
-          Download
-        </button> */}
+        )}
+
+        {role !== "admin" && (
+          <div className=" flex gap-1 items-center">
+            <div className="flex gap-1 items-center ">
+              <div className="">Duplicate file: ({file?.duplicate}) </div>
+              {file?.flaggedFileName || "N/A"}
+            </div>
+            <div
+              onClick={() => handleDownload(file?.flaggedFileName)}
+              className="cursor-pointer"
+            >
+              <FaCloudDownloadAlt />
+            </div>
+          </div>
+        )}
+
+        {role === "admin" && (
+          <div>
+            <div>Duplicate: {file?.duplicate}</div>
+          </div>
+        )}
       </div>
     </div>
   );
