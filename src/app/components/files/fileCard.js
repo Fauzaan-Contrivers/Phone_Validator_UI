@@ -4,10 +4,10 @@ import React from "react";
 import { FaCloudDownloadAlt } from "react-icons/fa";
 
 const formatDate = (date) => {
-  return dayjs(date).format("YYYY-MM-DD h:mm:ss A");
+  return dayjs(date).format("YYYY-MM-DD HH:mm:ss"); // Use HH for 24-hour format
 };
 export default function fileCard({ file, handleDownload, role }) {
-  const formattedDate = formatDate(file?.updated_at);
+  const formattedDate = formatDate(file?.createdAt);
   return (
     <div
       key={file.id}
