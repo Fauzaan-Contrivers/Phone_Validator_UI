@@ -13,10 +13,9 @@ const Home = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [row, setrow] = useState("");
   const [totalPhones, setTotalDbPhones] = useState("");
+  const [Userrole, setuserRole] = useState("");
 
   const [loading, setLoading] = useState(false);
-
-  const Userrole = Cookies.get("role");
 
   // Fetch all files from the database
   const fetchFiles = async () => {
@@ -62,11 +61,8 @@ const Home = () => {
   useEffect(() => {
     fetchFiles();
     fetchPhoneCount();
-    setrow(
-      Userrole !== "admin" && (
-        <th className="px-3 py-2 text-left">Cleaned File</th>
-      )
-    );
+
+    setuserRole(Cookies.get("role"));
   }, []);
 
   // Handle file selection
@@ -234,10 +230,12 @@ const Home = () => {
               Upload
             </button>
           </div>
-          <div className="bg-gray-200 text-[20px]  text-center sm:px-3 sm:py-3 p-2">
-            <div className="font-semibold">Total records</div>
-            {totalPhones}
-          </div>
+          {Userrole === "admin" && (
+            <div className="bg-gray-200 text-[20px]  text-center sm:px-3 sm:py-3 p-2">
+              <div className="font-semibold">Total records</div>
+              {totalPhones}
+            </div>
+          )}
         </div>
 
         {/* <h1>File List</h1> */}
@@ -249,8 +247,15 @@ const Home = () => {
                 <th className="px-3 py-2 text-left">Uploaded At</th>
                 <th className="px-3 py-2 text-left">Uploaded By</th>
                 <th className="px-3 py-2 text-left">Original File</th>
-                {row}
-                <th className="px-3 py-2 text-left">Duplicate File</th>
+                {Userrole !== "admin" && (
+                  <th className="px-3 py-2 text-left">Cleaned File</th>
+                )}
+
+                {Userrole === "admin" ? (
+                  <th className="px-3 py-2 text-left">Duplicate</th>
+                ) : (
+                  <th className="px-3 py-2 text-left">Duplicate File</th>
+                )}
               </tr>
             </thead>
             <tbody>
