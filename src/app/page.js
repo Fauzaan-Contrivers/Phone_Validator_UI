@@ -81,7 +81,7 @@ const Home = () => {
       };
       const id = Cookies.get("userId");
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/adminUpload/${id}`,
         formData,
         config
       );
@@ -131,7 +131,7 @@ const Home = () => {
       };
       const id = Cookies.get("userId");
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload-file/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/userUpload/${id}`,
         formData,
         config
       );
