@@ -8,7 +8,7 @@ const formatDate = (date) => {
 };
 
 const FileRow = ({ file, handleDownload, role }) => {
-  const formattedDate = formatDate(file?.updated_at);
+  const formattedDate = formatDate(file?.createdAt);
 
   return (
     <tr key={file?.id} className="border-gray-300 hover:bg-gray-200">
