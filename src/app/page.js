@@ -11,8 +11,11 @@ import InfiniteProgressBar from "../common/Progressbar";
 const Home = () => {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [row, setrow] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  const Userrole = Cookies.get("role");
 
   // Fetch all files from the database
   const fetchFiles = async () => {
@@ -38,6 +41,11 @@ const Home = () => {
 
   useEffect(() => {
     fetchFiles();
+    setrow(
+      Userrole !== "admin" && (
+        <th className="px-3 py-2 text-left">Cleaned File</th>
+      )
+    );
   }, []);
 
   // Handle file selection
@@ -216,8 +224,8 @@ const Home = () => {
                 <th className="px-3 py-2 text-left">Uploaded At</th>
                 <th className="px-3 py-2 text-left">Uploaded By</th>
                 <th className="px-3 py-2 text-left">Original File</th>
-                {/* <th className="px-3 py-2 text-left">Analyzed File</th> */}
-                <th className="px-3 py-2 text-left">Cleaned File</th>
+                {row}
+                <th className="px-3 py-2 text-left">Duplicate File</th>
               </tr>
             </thead>
             <tbody>

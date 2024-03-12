@@ -94,8 +94,11 @@ const Home = () => {
 
   // Handle file download logic (replace with your implementation)
   const handleDelete = (fileId) => {
-    // Implement download logic using libraries like `axios` or download link generation
-    console.log("Downloading file:", fileId);
+    toast.success("User deleted successfully", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+    fetchUsers();
   };
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -150,18 +153,15 @@ const Home = () => {
     <>
       {loading && <InfiniteProgressBar />}
       <Navbar />
-      <div className="p-4 pt-[80px]">
+      <div className="p-4 mt-4 pt-[80px]">
         <div className="flex  justify-between mb-4 items-center">
-          <div className="flex flex-col justify-between my-4">
+          {/* <div className="flex flex-col justify-between my-4">
             <input
               type="file"
               className="custom-file-input"
               id="uploadFile"
               onChange={handleFileChange}
             />
-            {/* <label className="custom-file-label" htmlFor="uploadFile">
-              {!selectedFile ? "Choose a file..." : selectedFile.name}
-            </label> */}
             <button
               className="btn-primary w-[100px] mt-4 "
               onClick={handleUpload}
@@ -169,8 +169,8 @@ const Home = () => {
             >
               Upload
             </button>
-          </div>
-
+          </div> */}
+          <div></div>
           <button
             className="btn-primary w-[150px] "
             onClick={() => setShowModal(true)}
@@ -221,7 +221,7 @@ const Home = () => {
                 <th className="px-3 py-2 text-left">Name</th>
                 <th className="px-3 py-2 text-left">Email</th>
                 <th className="px-3 py-2 text-left">Role</th>
-                {/* <th className="px-3 py-2 text-left">Action</th> */}
+                <th className="px-3 py-2 text-left">Action</th>
               </tr>
             </thead>
             <tbody>
