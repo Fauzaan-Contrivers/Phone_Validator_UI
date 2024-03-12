@@ -235,7 +235,7 @@ const Home = () => {
             </button>
           </div>
           <div className="bg-gray-200 text-[20px]  text-center sm:px-3 sm:py-3 p-2">
-            <div className="font-semibold">Total phone</div>
+            <div className="font-semibold">Total records</div>
             {totalPhones}
           </div>
         </div>
