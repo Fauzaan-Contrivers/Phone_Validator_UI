@@ -2,7 +2,6 @@ import React from "react";
 import axios from "axios";
 
 const UserRow = ({ user, handleDelete }) => {
-  const role = Cookies.get("role");
   const deleteUser = async (userId) => {
     try {
       const response = await axios.delete(

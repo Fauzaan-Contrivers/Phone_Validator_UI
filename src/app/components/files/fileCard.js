@@ -2,14 +2,12 @@
 import dayjs from "dayjs";
 import React from "react";
 import { FaCloudDownloadAlt } from "react-icons/fa";
-import Cookies from "js-cookie";
 
 const formatDate = (date) => {
   return dayjs(date).format("YYYY-MM-DD h:mm:ss A");
 };
-export default function fileCard({ file, handleDownload }) {
+export default function fileCard({ file, handleDownload, role }) {
   const formattedDate = formatDate(file?.updated_at);
-  const role = Cookies.get("role");
   return (
     <div
       key={file.id}

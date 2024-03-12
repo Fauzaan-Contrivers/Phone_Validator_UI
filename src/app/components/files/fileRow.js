@@ -2,15 +2,14 @@
 import dayjs from "dayjs";
 import React from "react";
 import { FaCloudDownloadAlt } from "react-icons/fa";
-import Cookies from "js-cookie";
 
 const formatDate = (date) => {
   return dayjs(date).format("YYYY-MM-DD h:mm:ss A");
 };
 
-const FileRow = ({ file, handleDownload }) => {
+const FileRow = ({ file, handleDownload, role }) => {
   const formattedDate = formatDate(file?.updated_at);
-  const role = Cookies.get("role");
+
   return (
     <tr key={file?.id} className="border-gray-300 hover:bg-gray-200">
       <td className="px-3 py-2 text-left">{formattedDate}</td>
@@ -61,8 +60,8 @@ const FileRow = ({ file, handleDownload }) => {
       )}
 
       {role === "admin" && (
-        <td className="px-3 py-2 text-left flex gap-4 items-center ">
-          <div>{file?.duplicate}</div>
+        <td className=" ">
+          <div className="ml-4">{file?.duplicate}</div>
         </td>
       )}
     </tr>
