@@ -220,8 +220,8 @@ const Home = () => {
               className="custom-file-input max-w-[250px]"
               id="uploadFile"
               onChange={handleFileChange}
-              accept=".csv"
-            />
+              accept=".csv, .xlsx"
+              />
             <button
               className="btn-primary w-[100px] mt-4"
               onClick={handleUpload}
