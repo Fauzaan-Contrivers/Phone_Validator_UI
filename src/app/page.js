@@ -259,8 +259,8 @@ const Home = () => {
           Guidelines:
           <ul className="text-red-500 list-decimal ml-6">
             <li>
-              Column name can’t have empty space between them. For example,
-              FirstName, First_Name, phone-number etc
+              Column names must not have space in them. Correct formats are
+              FirstName, last_name, phone_number
             </li>
             <li>There should be no empty row in the sheet</li>
           </ul>
