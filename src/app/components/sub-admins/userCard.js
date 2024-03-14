@@ -1,7 +1,11 @@
 import React from "react";
 import axios from "axios";
 
-export default function UserCard({ user, handleDelete }) {
+export default function UserCard({
+  user,
+  handleDelete,
+  handleShowUpdateUserModal,
+}) {
   const deleteUser = async (userId) => {
     try {
       const response = await axios.delete(
@@ -31,9 +35,20 @@ export default function UserCard({ user, handleDelete }) {
         <p>Name: {user?.name}</p>
         <p>Email: {user?.email}</p>
         <p>Role: {user?.role}</p>
-        <button className="btn-delete" onClick={() => deleteUser(user?.id)}>
-          Delete
-        </button>
+
+        {user?.role !== "admin" && (
+          <button
+            className="btn-primary w-auto"
+            onClick={() => handleShowUpdateUserModal(user)}
+          >
+            Update
+          </button>
+        )}
+        {user?.role !== "admin" && (
+          <button className="btn-delete  " onClick={() => deleteUser(user?.id)}>
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

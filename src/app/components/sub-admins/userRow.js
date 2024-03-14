@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-const UserRow = ({ user, handleDelete }) => {
+const UserRow = ({ user, handleDelete, handleShowUpdateUserModal }) => {
   const deleteUser = async (userId) => {
     try {
       const response = await axios.delete(
@@ -29,9 +29,22 @@ const UserRow = ({ user, handleDelete }) => {
       <td>{user?.email}</td>
       <td className="px-3 py-2 text-left">{user?.role}</td>
       <td className="px-3 py-2 text-left">
-        <button className="btn-delete" onClick={() => deleteUser(user?.id)}>
-          Delete
-        </button>
+        {user?.role !== "admin" && (
+          <button
+            className="btn-primary w-auto"
+            onClick={() => handleShowUpdateUserModal(user)}
+          >
+            Update
+          </button>
+        )}
+        {user?.role !== "admin" && (
+          <button
+            className="btn-delete ml-2"
+            onClick={() => deleteUser(user?.id)}
+          >
+            Delete
+          </button>
+        )}
       </td>
     </tr>
   );

@@ -23,8 +23,10 @@ const validationSchema = yup.object().shape({
 const Home = () => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false); // State for modal visibility
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [updateUserId, setUpdateUserId] = useState("");
+  const [updateUserLimitValue, setUpdateUserLimitValue] = useState(0);
 
   const {
     register,
@@ -61,7 +63,6 @@ const Home = () => {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          // Add any other headers if needed
         },
       };
       const response = await axios.post(
@@ -73,14 +74,14 @@ const Home = () => {
         setLoading(false);
         toast.success(response?.data?.message, {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 10000,
         });
         fetchUsers();
       } else {
         setLoading(false);
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 10000,
         });
       }
     } catch (error) {
@@ -92,27 +93,19 @@ const Home = () => {
     setShowModal(false);
   };
 
-  // Handle file download logic (replace with your implementation)
-  const handleDelete = (fileId) => {
-    toast.success("User deleted successfully", {
-      position: "top-right",
-      autoClose: 2000,
-    });
-    fetchUsers();
-  };
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
-  const handleUpload = async () => {
-    setLoading(true);
-    if (!selectedFile) {
-      setLoading(false);
+  const handleUpdateUser = async () => {
+    if (updateUserLimitValue <= 0) {
+      toast.error("Please enter correct value", {
+        position: "top-right",
+        autoClose: 10000,
+      });
+    }
+
+    if (updateUserLimitValue <= 0) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("image", selectedFile);
-
+    setLoading(true);
     try {
       const token = Cookies.get("token");
       const config = {
@@ -120,33 +113,49 @@ const Home = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-      const id = Cookies.get("userId");
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/sheets/upload/${id}`,
-        formData,
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/updateUser/${updateUserId}`,
+        { uploadLimit: updateUserLimitValue },
         config
       );
-
       if (!response?.data?.error) {
-        setSelectedFile(null);
         setLoading(false);
-        toast.success("Sheet uploaded.", {
+        toast.success(response?.data?.message, {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 10000,
         });
+        setShowUpdateModal(false);
+        setUpdateUserLimitValue(0);
+        setUpdateUserId("");
+        fetchUsers();
       } else {
         setLoading(false);
-        // console.error("Error uploading file:", await response.json());
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 10000,
         });
-        // Handle upload error
       }
     } catch (error) {
       setLoading(false);
-      console.error("Error uploading file:", error);
+      console.log("Error submitting form:", error);
+    } finally {
     }
+  };
+
+  // Handle file download logic (replace with your implementation)
+  const handleDelete = (fileId) => {
+    toast.success("User deleted successfully", {
+      position: "top-right",
+      autoClose: 10000,
+    });
+    fetchUsers();
+  };
+
+  // Handle file download logic (replace with your implementation)
+  const handleShowUpdateUserModal = (user) => {
+    setUpdateUserId(user?.id);
+    setShowUpdateModal(true);
+    setUpdateUserLimitValue(user?.uploadLimit);
   };
 
   return (
@@ -155,21 +164,6 @@ const Home = () => {
       <Navbar />
       <div className="p-4 mt-4 pt-[80px]">
         <div className="flex  justify-between mb-4 items-center">
-          {/* <div className="flex flex-col justify-between my-4">
-            <input
-              type="file"
-              className="custom-file-input"
-              id="uploadFile"
-              onChange={handleFileChange}
-            />
-            <button
-              className="btn-primary w-[100px] mt-4 "
-              onClick={handleUpload}
-              disabled={!selectedFile}
-            >
-              Upload
-            </button>
-          </div> */}
           <div></div>
           <button
             className="btn-primary w-[150px] "
@@ -178,7 +172,7 @@ const Home = () => {
             Add User
           </button>
         </div>
-
+        {/* Add User Modal */}
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <h3 className=" text-[24px] font-semibold">Add New User</h3>
           <form onSubmit={handleSubmit(handleAddUser)}>
@@ -208,12 +202,64 @@ const Home = () => {
                 <span className="text-red-500">{errors.email.message}</span>
               )}
             </div>
+            <div className="mb-4">
+              <label htmlFor="email">UploadLimit</label>
+              <input
+                type="number"
+                name="uploadLimit"
+                id="uploadLimit"
+                {...register("uploadLimit")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+              {errors.email && (
+                <span className="text-red-500">
+                  {errors?.uploadLimit?.message}
+                </span>
+              )}
+            </div>
 
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Adding User..." : "Add User"}
             </button>
           </form>
         </Modal>
+
+        {/* Update User Modal */}
+        <Modal
+          isOpen={showUpdateModal}
+          onClose={() => setShowUpdateModal(false)}
+        >
+          <h3 className=" text-[24px] font-semibold">Update User</h3>
+          <form>
+            <div className="mb-4">
+              <label htmlFor="email">UploadLimit</label>
+              <input
+                type="number"
+                name="uploadLimit"
+                id="uploadLimit"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                onChange={(e) => {
+                  setUpdateUserLimitValue(e.target.value);
+                }}
+                value={updateUserLimitValue}
+              />
+              {errors.email && (
+                <span className="text-red-500">
+                  {errors?.uploadLimit?.message}
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={handleUpdateUser}
+              className="btn-primary"
+              disabled={loading}
+            >
+              {loading ? "Uodating User..." : "Update User"}
+            </button>
+          </form>
+        </Modal>
+
         <div className="lg:block hidden ">
           <table className="w-full table-auto border-collapse responsive-table">
             <thead>
@@ -230,6 +276,7 @@ const Home = () => {
                   key={user?.id}
                   user={user}
                   handleDelete={handleDelete}
+                  handleShowUpdateUserModal={handleShowUpdateUserModal}
                 />
               ))}
             </tbody>
@@ -237,7 +284,12 @@ const Home = () => {
         </div>
         <div className="lg:hidden flex flex-col gap-4 ">
           {users.map((user) => (
-            <UserCard key={user?.id} user={user} handleDelete={handleDelete} />
+            <UserCard
+              key={user?.id}
+              user={user}
+              handleDelete={handleDelete}
+              handleShowUpdateUserModal={handleShowUpdateUserModal}
+            />
           ))}
         </div>
       </div>
