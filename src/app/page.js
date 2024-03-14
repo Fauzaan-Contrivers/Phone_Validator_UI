@@ -107,7 +107,7 @@ const Home = () => {
         setSelectedFile(null); // Clear selected file after upload
         toast.success("Sheet uploaded.", {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 10000,
         });
         fetchFiles();
         fetchPhoneCount();
@@ -116,7 +116,7 @@ const Home = () => {
         console.log("Error uploading file:", await response.json());
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 10000,
         });
         // Handle upload error
       }
@@ -159,14 +159,14 @@ const Home = () => {
         setLoading(false);
         toast.success(response?.data?.message, {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 10000,
         });
         fetchFiles();
       } else {
         setLoading(false);
         toast.error(response?.data?.message, {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 10000,
         });
         console.log("Error uploading file:");
       }
@@ -187,31 +187,35 @@ const Home = () => {
           // Add any other headers if needed
         },
       };
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/download/${name}`, config);
-    
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/download/${name}`,
+        config
+      );
+
       // Check if the request was successful
       if (!response.ok) {
-        throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to download file: ${response.status} ${response.statusText}`
+        );
       }
-  
+
       // Convert the response to a Blob
       const blob = await response.blob();
-  
+
       // Create a temporary URL for the blob
       const url = window.URL.createObjectURL(blob);
-  
+
       // Create a temporary anchor element
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = name; // Set the filename for the downloaded file
-  
+
       // Programmatically click the anchor element to trigger the download
       document.body.appendChild(a);
       a.click();
-  
+
       // Cleanup
       window.URL.revokeObjectURL(url);
-
     } catch (error) {
       console.log("Error fetching files:", error);
       toast.error(error?.message, {
@@ -234,7 +238,7 @@ const Home = () => {
               id="uploadFile"
               onChange={handleFileChange}
               accept=".csv, .xlsx"
-              />
+            />
             <button
               className="btn-primary w-[100px] mt-4"
               onClick={handleUpload}
