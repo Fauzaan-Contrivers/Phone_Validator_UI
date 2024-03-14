@@ -255,6 +255,17 @@ const Home = () => {
           )}
         </div>
 
+        <div className="my-2">
+          Guidelines:
+          <ul className="text-red-500 list-decimal ml-6">
+            <li>
+              Column names must not have space in them. Correct formats are
+              FirstName, last_name, phone_number
+            </li>
+            <li>There should be no empty row in the sheet</li>
+          </ul>
+        </div>
+
         {/* <h1>File List</h1> */}
 
         <div className="lg:block hidden ">
