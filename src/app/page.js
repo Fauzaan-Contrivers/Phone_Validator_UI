@@ -187,18 +187,31 @@ const Home = () => {
           // Add any other headers if needed
         },
       };
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/download/:${name}`,
-        config
-      );
-      console.log("response :>> ", response);
-      const url = window.URL.createObjectURL(new Blob([response.data])); // Access response.data as the Blob
-      const a = document.createElement("a");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/download/${name}`, config);
+    
+      // Check if the request was successful
+      if (!response.ok) {
+        throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);
+      }
+  
+      // Convert the response to a Blob
+      const blob = await response.blob();
+  
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(blob);
+  
+      // Create a temporary anchor element
+      const a = document.createElement('a');
       a.href = url;
-      a.download = `${name}`;
+      a.download = name; // Set the filename for the downloaded file
+  
+      // Programmatically click the anchor element to trigger the download
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+  
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+
     } catch (error) {
       console.log("Error fetching files:", error);
       toast.error(error?.message, {
