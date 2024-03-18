@@ -120,7 +120,7 @@ const Home = () => {
       .catch(error => {
         // Handle any errors
         setLoading(false);
-        console.log("Error uploading file:", response.json());
+        //console.log("Error uploading file:", response.json());
         toast.error(response?.data?.message, {
           position: "top-right",
           autoClose: 10000,
