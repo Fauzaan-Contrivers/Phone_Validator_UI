@@ -92,8 +92,6 @@ const Home = () => {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          Connection: "keep-alive",
-          "Keep-Alive": "timeout=6000",
         },
       };
       const id = Cookies.get("userId");
@@ -143,8 +141,6 @@ const Home = () => {
         headers: {
           Authorization: `Bearer ${token}`,
           // Add any other headers if needed
-          Connection: "keep-alive",
-          "Keep-Alive": "timeout=6000",
         },
       };
       const id = Cookies.get("userId");
