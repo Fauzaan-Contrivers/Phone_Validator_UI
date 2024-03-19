@@ -95,38 +95,29 @@ const Home = () => {
         },
       };
       const id = Cookies.get("userId");
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/sheets/adminUpload/${id}`;
-
-      fetch(url, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...config.headers
-        }
-      })
-      .then(response => {
-        // Handle the response
-        if (!response?.data?.error) {
-          setLoading(false);
-          setSelectedFile(null); // Clear selected file after upload
-          toast.success("Sheet uploaded.", {
-            position: "top-right",
-            autoClose: 10000,
-          });
-          fetchFiles();
-          fetchPhoneCount();
-        }
-      })
-      .catch(error => {
-        // Handle any errors
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/sheets/adminUpload/${id}`,
+        formData,
+        config
+      );
+      if (!response?.data?.error) {
         setLoading(false);
-        //console.log("Error uploading file:", response.json());
+        setSelectedFile(null); // Clear selected file after upload
+        toast.success("Sheet uploaded.", {
+          position: "top-right",
+          autoClose: 10000,
+        });
+        fetchFiles();
+        fetchPhoneCount();
+      } else {
+        setLoading(false);
+        console.log("Error uploading file:", await response.json());
         toast.error(response?.data?.message, {
           position: "top-right",
           autoClose: 10000,
         });
-      });
-      
+        // Handle upload error
+      }
          
     } catch (error) {
       console.log("Error uploading file:", error);
